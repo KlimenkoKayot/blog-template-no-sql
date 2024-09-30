@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+    
+    <title>Index</title>
+</head>
+<body>
+  <div class="form-group">
+    <label for="addButton">Create new post </label>
+    <button id="addButton" class="do-add btn btn-success">Add</button>
+  </div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Id</th>
+        <th scope="col">Title</th>
+        <th scope="col">Author</th>
+        <th scope="col">Text</th>
+        <th scope="col">Updated</th>
+        <th scope="col">edit</th>
+        <th scope="col">delete</th>
+      </tr>
+    </thead>
+    <tbody>
+    {{range .Posts}}
+        <tr>
+            <th scope="row">{{.Id}}</th>
+            <td>{{.Title}}</td>
+            {{if .Author.Valid}}
+            <td>{{.Author.String}}</td>
+            {{end}}
+            <td>{{.Text}}</td>
+            <td>{{if .Updated.Valid}}{{.Updated.String}}{{end}}</td>
+            <td>
+              <span data-id="{{.Id}}" class="do-edit btn btn-primary">Edit</span>
+            </td>
+            <td>
+              <span data-id="{{.Id}}" class="do-delete btn btn-primary">Delete</span>
+            </td>
+        </tr>
+    {{end}}
+    </tbody>
+  </table>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"></script>
+
+    <script type="text/javascript">
+    $('.do-delete').click(function() {
+      if(!confirm("Are you sure?")) {
+        return
+      }
+      $elem = $(this)
+      $.ajax({
+        url: '/posts/delete/' + $elem.data("id"),
+        type: 'DELETE',
+        data: {},
+        success: function(resp) {
+          if(resp.affected > 0 ) {
+            $elem.parent().parent().remove()
+          }
+        },
+      });
+      location.reload();
+    })
+
+    $('.do-edit').click(function(){
+      $elem = $(this)
+      location.replace('/posts/edit/' + $elem.data("id"))
+    })
+
+    $('.do-add').click(function(){
+      location.replace('/posts/add')
+    })
+    </script>
+
+</body>
+</html>
